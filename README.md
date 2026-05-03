@@ -1,2 +1,836 @@
-# MemoryGame
-NS
+<!DOCTYPE html>
+
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لعبة تذكر الأرقام</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cyan: #00e5ff;
+    --purple: #8b5cf6;
+    --bg: #070710;
+    --card: rgba(255,255,255,0.04);
+    --border: rgba(255,255,255,0.08);
+    --text: #e8eaf0;
+    --muted: rgba(255,255,255,0.35);
+  }
+
+- { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+font-family: ‘Tajawal’, sans-serif;
+background: var(–bg);
+color: var(–text);
+min-height: 100vh;
+display: flex;
+align-items: center;
+justify-content: center;
+overflow: hidden;
+}
+
+/* خلفية متحركة */
+.bg {
+position: fixed;
+inset: 0;
+z-index: 0;
+overflow: hidden;
+}
+.bg::before {
+content: ‘’;
+position: absolute;
+width: 600px; height: 600px;
+border-radius: 50%;
+background: radial-gradient(circle, rgba(0,229,255,0.07) 0%, transparent 70%);
+top: -200px; left: 50%;
+transform: translateX(-50%);
+animation: breathe 6s ease-in-out infinite;
+}
+.bg::after {
+content: ‘’;
+position: absolute;
+width: 500px; height: 500px;
+border-radius: 50%;
+background: radial-gradient(circle, rgba(139,92,246,0.07) 0%, transparent 70%);
+bottom: -150px; right: -100px;
+animation: breathe 8s ease-in-out infinite reverse;
+}
+@keyframes breathe {
+0%, 100% { transform: translateX(-50%) scale(1); }
+50% { transform: translateX(-50%) scale(1.15); }
+}
+
+/* نقاط الشبكة */
+.dots {
+position: fixed;
+inset: 0;
+background-image: radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px);
+background-size: 32px 32px;
+pointer-events: none;
+z-index: 0;
+}
+
+.wrap {
+position: relative;
+z-index: 1;
+width: 100%;
+max-width: 420px;
+padding: 20px;
+}
+
+/* ===== هيدر ===== */
+.header {
+text-align: center;
+margin-bottom: 28px;
+}
+
+.logo {
+display: inline-flex;
+align-items: center;
+gap: 10px;
+margin-bottom: 6px;
+}
+
+.logo-icon {
+width: 44px; height: 44px;
+background: linear-gradient(135deg, var(–cyan), var(–purple));
+border-radius: 14px;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 1.4rem;
+box-shadow: 0 0 20px rgba(0,229,255,0.25);
+}
+
+h1 {
+font-size: 1.7rem;
+font-weight: 900;
+background: linear-gradient(135deg, #fff 30%, var(–cyan));
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+}
+
+.tagline {
+color: var(–muted);
+font-size: 0.88rem;
+}
+
+/* ===== بطاقة ===== */
+.card {
+background: var(–card);
+border: 1px solid var(–border);
+border-radius: 24px;
+padding: 24px;
+backdrop-filter: blur(10px);
+margin-bottom: 14px;
+}
+
+/* ===== إحصائيات ===== */
+.stats {
+display: grid;
+grid-template-columns: 1fr 1fr 1fr;
+gap: 10px;
+margin-bottom: 20px;
+}
+
+.stat {
+background: rgba(255,255,255,0.03);
+border: 1px solid var(–border);
+border-radius: 16px;
+padding: 12px 8px;
+text-align: center;
+}
+
+.stat-val {
+font-size: 1.5rem;
+font-weight: 900;
+color: var(–cyan);
+line-height: 1;
+margin-bottom: 4px;
+}
+
+.stat-lbl {
+font-size: 0.7rem;
+color: var(–muted);
+font-weight: 500;
+}
+
+/* ===== حياة ===== */
+.lives {
+display: flex;
+justify-content: center;
+gap: 10px;
+margin-bottom: 18px;
+}
+
+.heart {
+width: 28px;
+height: 26px;
+position: relative;
+transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+image-rendering: pixelated;
+}
+
+.heart svg {
+width: 100%;
+height: 100%;
+filter: drop-shadow(0 0 6px rgba(255,60,80,0.7));
+}
+
+.heart.lost svg {
+filter: none;
+}
+.heart.lost svg .heart-fill {
+fill: #2a2a3a;
+}
+.heart.lost svg .heart-shade {
+fill: #1a1a2a;
+}
+.heart.lost {
+transform: scale(0.85);
+opacity: 0.5;
+}
+
+/* ===== شاشة العرض ===== */
+.display {
+background: rgba(0,229,255,0.03);
+border: 1px solid rgba(0,229,255,0.12);
+border-radius: 20px;
+min-height: 110px;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+margin-bottom: 18px;
+position: relative;
+overflow: hidden;
+transition: background 0.3s, border-color 0.3s;
+}
+
+.display.flash-correct {
+background: rgba(0,229,255,0.03);
+border-color: rgba(0,229,255,0.12);
+}
+
+.display.flash-wrong {
+background: rgba(0,229,255,0.03);
+border-color: rgba(0,229,255,0.12);
+}
+
+input.flash-correct {
+background: rgba(0,255,120,0.12) !important;
+border-color: rgba(0,255,120,0.5) !important;
+box-shadow: 0 0 16px rgba(0,255,120,0.2) !important;
+}
+
+input.flash-wrong {
+background: rgba(255,60,60,0.12) !important;
+border-color: rgba(255,60,60,0.5) !important;
+box-shadow: 0 0 16px rgba(255,60,60,0.2) !important;
+}
+
+.display::before {
+content: ‘’;
+position: absolute;
+inset: 0;
+background: linear-gradient(135deg, rgba(0,229,255,0.04), transparent 60%);
+}
+
+.display-label {
+font-size: 0.72rem;
+color: var(–muted);
+font-weight: 500;
+letter-spacing: 1.5px;
+text-transform: uppercase;
+margin-bottom: 8px;
+}
+
+.display-num {
+font-size: 3rem;
+font-weight: 900;
+color: var(–cyan);
+text-shadow: 0 0 40px rgba(0,229,255,0.5);
+letter-spacing: 10px;
+animation: popIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.display-msg {
+font-size: 1.05rem;
+color: rgba(255,255,255,0.5);
+}
+
+@keyframes popIn {
+from { transform: scale(0.6); opacity: 0; }
+to { transform: scale(1); opacity: 1; }
+}
+
+/* ===== شريط تقدم ===== */
+.progress-wrap {
+margin-bottom: 18px;
+}
+.progress-label {
+display: flex;
+justify-content: space-between;
+font-size: 0.72rem;
+color: var(–muted);
+margin-bottom: 6px;
+}
+.progress-bar {
+height: 4px;
+background: rgba(255,255,255,0.06);
+border-radius: 99px;
+overflow: hidden;
+}
+.progress-fill {
+height: 100%;
+background: linear-gradient(90deg, var(–cyan), var(–purple));
+border-radius: 99px;
+transition: width 0.5s ease;
+box-shadow: 0 0 8px rgba(0,229,255,0.4);
+}
+
+/* ===== إدخال ===== */
+.input-group {
+display: flex;
+flex-direction: column;
+gap: 10px;
+margin-bottom: 14px;
+}
+
+input[type=“text”] {
+flex: 1;
+background: rgba(255,255,255,0.05);
+border: 1.5px solid rgba(255,255,255,0.1);
+border-radius: 16px;
+padding: 14px 18px;
+font-size: 1.5rem;
+font-family: ‘Tajawal’, sans-serif;
+font-weight: 700;
+color: #fff;
+text-align: center;
+letter-spacing: 8px;
+outline: none;
+transition: all 0.25s;
+}
+input[type=“text”]:focus {
+border-color: rgba(0,229,255,0.45);
+background: rgba(0,229,255,0.05);
+box-shadow: 0 0 0 3px rgba(0,229,255,0.08);
+}
+input[type=“text”]::placeholder {
+color: rgba(255,255,255,0.18);
+font-size: 0.9rem;
+letter-spacing: 1px;
+}
+input:disabled {
+opacity: 0.4;
+}
+
+/* ===== أزرار ===== */
+.btn {
+border: none;
+font-family: ‘Tajawal’, sans-serif;
+font-weight: 700;
+cursor: pointer;
+transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+position: relative;
+overflow: hidden;
+}
+
+.btn::after {
+content: ‘’;
+position: absolute;
+inset: 0;
+background: rgba(255,255,255,0);
+transition: background 0.2s;
+}
+.btn:hover::after { background: rgba(255,255,255,0.08); }
+.btn:active { transform: scale(0.96); }
+
+.btn-confirm {
+width: 100%;
+height: 50px;
+background: linear-gradient(135deg, var(–cyan), #0099bb);
+border-radius: 16px;
+font-size: 1.1rem;
+color: #000;
+font-weight: 900;
+box-shadow: 0 4px 16px rgba(0,229,255,0.3);
+letter-spacing: 1px;
+}
+.btn-confirm:hover { box-shadow: 0 6px 24px rgba(0,229,255,0.45); }
+
+.btn-start {
+width: 100%;
+padding: 17px;
+font-size: 1.1rem;
+border-radius: 18px;
+background: linear-gradient(135deg, var(–cyan) 0%, var(–purple) 100%);
+color: #fff;
+letter-spacing: 0.5px;
+box-shadow: 0 4px 24px rgba(0,229,255,0.25);
+margin-bottom: 12px;
+}
+.btn-start:hover { box-shadow: 0 8px 32px rgba(0,229,255,0.4); }
+
+.btn-ghost {
+width: 100%;
+padding: 14px;
+font-size: 0.95rem;
+border-radius: 16px;
+background: transparent;
+border: 1.5px solid var(–border);
+color: var(–muted);
+}
+.btn-ghost:hover { border-color: rgba(255,255,255,0.2); color: var(–text); }
+
+/* ===== ردود الفعل ===== */
+.feedback {
+border-radius: 14px;
+padding: 12px 16px;
+font-size: 0.95rem;
+font-weight: 700;
+text-align: center;
+margin-bottom: 14px;
+opacity: 0;
+transform: translateY(-6px);
+transition: all 0.3s;
+display: none;
+}
+.feedback.show {
+opacity: 1;
+transform: translateY(0);
+display: block;
+}
+.feedback.correct {
+background: rgba(0,255,120,0.08);
+border: 1px solid rgba(0,255,120,0.2);
+color: #00e676;
+}
+.feedback.wrong {
+background: rgba(255,82,82,0.08);
+border: 1px solid rgba(255,82,82,0.2);
+color: #ff5252;
+}
+
+/* ===== تعليمات ===== */
+.instructions {
+border-radius: 18px;
+overflow: hidden;
+margin-bottom: 16px;
+}
+
+.step {
+display: flex;
+align-items: flex-start;
+gap: 14px;
+padding: 14px 16px;
+border-bottom: 1px solid var(–border);
+background: rgba(255,255,255,0.025);
+transition: background 0.2s;
+}
+.step:last-child { border-bottom: none; }
+.step:hover { background: rgba(255,255,255,0.04); }
+
+.step-num {
+width: 30px; height: 30px;
+border-radius: 10px;
+background: linear-gradient(135deg, var(–cyan), var(–purple));
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 0.8rem;
+font-weight: 900;
+color: #fff;
+flex-shrink: 0;
+box-shadow: 0 2px 8px rgba(0,229,255,0.2);
+}
+
+.step-text {
+padding-top: 4px;
+}
+.step-title {
+font-size: 0.92rem;
+font-weight: 700;
+color: var(–text);
+margin-bottom: 2px;
+}
+.step-desc {
+font-size: 0.78rem;
+color: var(–muted);
+line-height: 1.5;
+}
+
+/* ===== شاشة انتهاء ===== */
+.result-icon {
+font-size: 3.5rem;
+text-align: center;
+margin-bottom: 12px;
+animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.result-title {
+text-align: center;
+font-size: 1.5rem;
+font-weight: 900;
+margin-bottom: 6px;
+}
+.result-sub {
+text-align: center;
+color: var(–muted);
+font-size: 0.88rem;
+margin-bottom: 20px;
+}
+.result-score {
+text-align: center;
+font-size: 3.5rem;
+font-weight: 900;
+color: var(–cyan);
+text-shadow: 0 0 30px rgba(0,229,255,0.4);
+line-height: 1;
+margin-bottom: 4px;
+}
+.result-best {
+text-align: center;
+color: var(–muted);
+font-size: 0.85rem;
+margin-bottom: 24px;
+}
+.result-best span { color: var(–cyan); font-weight: 700; }
+
+.hidden { display: none !important; }
+</style>
+
+</head>
+<body>
+
+<div class="bg"></div>
+<div class="dots"></div>
+
+<div class="wrap">
+
+  <!-- شاشة البداية -->
+
+  <div id="startScreen">
+    <div class="header">
+      <div class="logo">
+        <div class="logo-icon"><svg viewBox="0 0 14 14" width="26" height="26" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="0" width="2" height="2" fill="#fff"/><rect x="5" y="2" width="4" height="2" fill="#fff"/><rect x="0" y="4" width="14" height="2" fill="#fff"/><rect x="2" y="6" width="10" height="2" fill="#fff"/><rect x="3" y="8" width="8" height="2" fill="#fff"/><rect x="2" y="10" width="2" height="2" fill="#fff"/><rect x="10" y="10" width="2" height="2" fill="#fff"/><rect x="1" y="12" width="3" height="2" fill="#fff"/><rect x="10" y="12" width="3" height="2" fill="#fff"/></svg></div>
+        <h1>تذكّر الأرقام</h1>
+      </div>
+      <p class="tagline">اختبر ذاكرتك — كل مرحلة تحدٍّ جديد</p>
+    </div>
+
+```
+<div class="card">
+  <div class="instructions">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-text">
+        <div class="step-title">شاهد الأرقام</div>
+        <div class="step-desc">ستظهر الأرقام واحداً تلو الآخر لثوانٍ قصيرة</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-text">
+        <div class="step-title">تذكّر التسلسل</div>
+        <div class="step-desc">احفظ ترتيب الأرقام في ذهنك بدقة</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-text">
+        <div class="step-title">أدخل الإجابة</div>
+        <div class="step-desc">اكتب الأرقام بنفس الترتيب الذي رأيته</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-text">
+        <div class="step-title">تقدّم في المراحل</div>
+        <div class="step-desc">كل مرحلة يُضاف رقم جديد — عندك 3 محاولات</div>
+      </div>
+    </div>
+  </div>
+  <button class="btn btn-start" onclick="startGame()">ابدأ اللعبة</button>
+</div>
+```
+
+  </div>
+
+  <!-- شاشة اللعبة -->
+
+  <div id="gameScreen" class="hidden">
+    <div class="header">
+      <div class="logo">
+        <div class="logo-icon"><svg viewBox="0 0 14 14" width="26" height="26" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="0" width="2" height="2" fill="#fff"/><rect x="5" y="2" width="4" height="2" fill="#fff"/><rect x="0" y="4" width="14" height="2" fill="#fff"/><rect x="2" y="6" width="10" height="2" fill="#fff"/><rect x="3" y="8" width="8" height="2" fill="#fff"/><rect x="2" y="10" width="2" height="2" fill="#fff"/><rect x="10" y="10" width="2" height="2" fill="#fff"/><rect x="1" y="12" width="3" height="2" fill="#fff"/><rect x="10" y="12" width="3" height="2" fill="#fff"/></svg></div>
+        <h1>تذكّر الأرقام</h1>
+      </div>
+    </div>
+
+```
+<div class="card">
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-val" id="statLevel">1</div>
+      <div class="stat-lbl">المرحلة</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val" id="statLen">1</div>
+      <div class="stat-lbl">طول التسلسل</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val" id="statBest">0</div>
+      <div class="stat-lbl">أعلى نقطة</div>
+    </div>
+  </div>
+
+<div class="lives" id="livesEl">
+  <span class="heart"><svg viewBox="0 0 16 14" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+    <rect class="heart-fill" x="1" y="0" width="3" height="1" fill="#ff2244"/>
+    <rect class="heart-fill" x="6" y="0" width="3" height="1" fill="#ff2244"/>
+    <rect class="heart-fill" x="0" y="1" width="5" height="1" fill="#ff2244"/>
+    <rect class="heart-fill" x="5" y="1" width="1" height="1" fill="#ff6680"/>
+    <rect class="heart-fill" x="6" y="1" width="3" height="1" fill="#ff2244"/>
+    <rect class="heart-fill" x="0" y="2" width="9" height="1" fill="#ff2244"/>
+    <rect class="heart-shade" x="1" y="2" width="2" height="1" fill="#ff6680"/>
+    <rect class="heart-fill" x="0" y="3" width="9" height="1" fill="#ff2244"/>
+    <rect class="heart-fill" x="1" y="4" width="7" height="1" fill="#ff2244"/>
+    <rect class="heart-fill" x="2" y="5" width="5" height="1" fill="#ff2244"/>
+    <rect class="heart-fill" x="3" y="6" width="3" height="1" fill="#ff2244"/>
+    <rect class="heart-fill" x="4" y="7" width="1" height="1" fill="#ff2244"/>
+    <!-- scaled x2 -->
+  </svg></span>
+  <span class="heart"><svg viewBox="0 0 16 14" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+    <rect class="heart-fill" x="1" y="0" width="3" height="1" fill="#ff2244"/>
+    <rect class="heart-fill" x="6" y="0" width="3" height="1" fill="#ff2244"/>
+    <rect class="heart-fill" x="0" y="1" width="5" height="1" fill="#ff2244"/>
+    <rect class="heart-fill" x="5" y="1" width="1" height="1" fill="#ff6680"/>
+    <rect class="heart-fill" x="6" y="1" width="3" height="1" fill="#ff2244"/>
+    <rect class="heart-fill" x="0" y="2" width="9" height="1" fill="#ff2244"/>
+    <rect class="heart-shade" x="1" y="2" width="2" height="1" fill="#ff6680"/>
+    <rect class="heart-fill" x="0" y="3" width="9" height="1" fill="#ff2244"/>
+    <rect class="heart-fill" x="1" y="4" width="7" height="1" fill="#ff2244"/>
+    <rect class="heart-fill" x="2" y="5" width="5" height="1" fill="#ff2244"/>
+    <rect class="heart-fill" x="3" y="6" width="3" height="1" fill="#ff2244"/>
+    <rect class="heart-fill" x="4" y="7" width="1" height="1" fill="#ff2244"/>
+  </svg></span>
+  <span class="heart"><svg viewBox="0 0 16 14" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+    <rect class="heart-fill" x="1" y="0" width="3" height="1" fill="#ff2244"/>
+    <rect class="heart-fill" x="6" y="0" width="3" height="1" fill="#ff2244"/>
+    <rect class="heart-fill" x="0" y="1" width="5" height="1" fill="#ff2244"/>
+    <rect class="heart-fill" x="5" y="1" width="1" height="1" fill="#ff6680"/>
+    <rect class="heart-fill" x="6" y="1" width="3" height="1" fill="#ff2244"/>
+    <rect class="heart-fill" x="0" y="2" width="9" height="1" fill="#ff2244"/>
+    <rect class="heart-shade" x="1" y="2" width="2" height="1" fill="#ff6680"/>
+    <rect class="heart-fill" x="0" y="3" width="9" height="1" fill="#ff2244"/>
+    <rect class="heart-fill" x="1" y="4" width="7" height="1" fill="#ff2244"/>
+    <rect class="heart-fill" x="2" y="5" width="5" height="1" fill="#ff2244"/>
+    <rect class="heart-fill" x="3" y="6" width="3" height="1" fill="#ff2244"/>
+    <rect class="heart-fill" x="4" y="7" width="1" height="1" fill="#ff2244"/>
+  </svg></span>
+</div>
+
+  <div class="progress-wrap">
+    <div class="progress-label">
+      <span>التقدم</span>
+      <span id="progText">المرحلة 1</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progFill" style="width:5%"></div>
+    </div>
+  </div>
+
+  <div class="display" id="displayBox">
+    <div class="display-msg" id="displayEl">جاهز للبدء...</div>
+  </div>
+
+  <div class="feedback" id="feedbackEl"></div>
+
+  <div class="input-group" id="inputGroup" style="opacity:0.3;pointer-events:none;">
+    <input type="text" id="userInput" placeholder="أدخل الأرقام هنا" maxlength="20" oninput="filterInput(this)" />
+    <button class="btn btn-confirm" onclick="checkAnswer()">ENTER</button>
+  </div>
+
+  <button class="btn btn-ghost" onclick="if(confirm('تريد إعادة اللعبة؟')) startGame()">إعادة المحاولة</button>
+</div>
+```
+
+  </div>
+
+  <!-- شاشة النتيجة -->
+
+  <div id="resultScreen" class="hidden">
+    <div class="header">
+      <div class="logo">
+        <div class="logo-icon"><svg viewBox="0 0 14 14" width="26" height="26" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="0" width="2" height="2" fill="#fff"/><rect x="5" y="2" width="4" height="2" fill="#fff"/><rect x="0" y="4" width="14" height="2" fill="#fff"/><rect x="2" y="6" width="10" height="2" fill="#fff"/><rect x="3" y="8" width="8" height="2" fill="#fff"/><rect x="2" y="10" width="2" height="2" fill="#fff"/><rect x="10" y="10" width="2" height="2" fill="#fff"/><rect x="1" y="12" width="3" height="2" fill="#fff"/><rect x="10" y="12" width="3" height="2" fill="#fff"/></svg></div>
+        <h1>تذكّر الأرقام</h1>
+      </div>
+    </div>
+
+```
+<div class="card">
+  <div class="result-icon" id="resultEmoji">💀</div>
+  <div class="result-title" id="resultTitle">انتهت اللعبة!</div>
+  <div class="result-sub">وصلت إلى المرحلة</div>
+  <div class="result-score" id="resultScore">0</div>
+  <div class="result-best">أعلى نقطة حققتها: <span id="resultBest">0</span></div>
+
+  <button class="btn btn-start" onclick="startGame()">العب مجدداً 🔄</button>
+  <button class="btn btn-ghost" onclick="showStart()" style="margin-top:10px;">الصفحة الرئيسية</button>
+</div>
+```
+
+  </div>
+
+</div>
+
+<script>
+  let seq = [], level = 1, lives = 3, best = 0, phase = 'idle';
+
+  function startGame() {
+    seq = []; level = 1; lives = 3; phase = 'showing';
+    show('gameScreen');
+    updateStats();
+    renderLives();
+    nextRound();
+  }
+
+  function show(id) {
+    ['startScreen','gameScreen','resultScreen'].forEach(s => {
+      document.getElementById(s).classList.toggle('hidden', s !== id);
+    });
+  }
+
+  function showStart() { show('startScreen'); }
+
+  function nextRound() {
+    phase = 'showing';
+    clearFeedback();
+    document.getElementById('userInput').value = '';
+    lockInput(true);
+    seq.push(Math.floor(Math.random() * 10));
+    updateStats();
+    setDisplay('استعد!', false);
+    setTimeout(() => showSeq(0), 700);
+  }
+
+  function showSeq(i) {
+    if (i >= seq.length) {
+      setDisplay('أدخل الأرقام', false);
+      lockInput(false);
+      document.getElementById('userInput').focus();
+      phase = 'input';
+      return;
+    }
+    setDisplay(seq[i].toString(), true);
+    setTimeout(() => {
+      setDisplay('', false);
+      setTimeout(() => showSeq(i + 1), 180);
+    }, 650);
+  }
+
+  function setDisplay(text, isNum) {
+    const el = document.getElementById('displayEl');
+    if (isNum) {
+      el.className = 'display-num';
+    } else {
+      el.className = 'display-msg';
+    }
+    // لابل
+    const box = document.getElementById('displayBox');
+    let lbl = box.querySelector('.display-label');
+    if (!lbl) { lbl = document.createElement('div'); lbl.className = 'display-label'; box.insertBefore(lbl, el); }
+    lbl.textContent = isNum ? `رقم ${seq.indexOf(parseInt(text)) + 1} من ${seq.length}` : '';
+    el.textContent = text;
+  }
+
+  function filterInput(inp) {
+    inp.value = inp.value.replace(/[^0-9]/g, '');
+  }
+
+  function flashDisplay(type) {
+    const input = document.getElementById('userInput');
+    input.classList.add(type === 'correct' ? 'flash-correct' : 'flash-wrong');
+    setTimeout(() => {
+      input.classList.remove('flash-correct', 'flash-wrong');
+    }, 600);
+  }
+
+  function checkAnswer() {
+    if (phase !== 'input') return;
+    const val = document.getElementById('userInput').value.trim();
+    const correct = seq.join('');
+    if (val === correct) {
+      flashDisplay('correct');
+      level++;
+      if (level - 1 > best) best = level - 1;
+      lockInput(true);
+      setTimeout(() => nextRound(), 900);
+    } else {
+      lives--;
+      renderLives();
+      flashDisplay('wrong');
+      if (lives <= 0) {
+        if (level - 1 > best) best = level - 1;
+        setTimeout(() => showResult(), 800);
+      } else {
+        const triesText = lives === 1 ? 'محاولة واحدة' : lives === 2 ? 'محاولتان' : `${lives} محاولات`;
+        setDisplay(`تبقى لك ${triesText}`, false);
+        setTimeout(() => {
+          setDisplay('أدخل الأرقام', false);
+        }, 1000);
+        document.getElementById('userInput').value = '';
+        document.getElementById('userInput').focus();
+      }
+    }
+  }
+
+  function showResult() {
+    show('resultScreen');
+    const reached = level - 1;
+    document.getElementById('resultScore').textContent = reached;
+    document.getElementById('resultBest').textContent = best;
+    const emoji = document.getElementById('resultEmoji');
+    const title = document.getElementById('resultTitle');
+    if (reached >= 12) { emoji.textContent = '🏆'; title.textContent = 'أسطورة الذاكرة!'; }
+    else if (reached >= 8) { emoji.textContent = '🌟'; title.textContent = 'أداء رائع جداً!'; }
+    else if (reached >= 5) { emoji.textContent = '😎'; title.textContent = 'مش بطال!'; }
+    else { emoji.textContent = '😅'; title.textContent = 'حاول مرة ثانية!'; }
+  }
+
+  function updateStats() {
+    document.getElementById('statLevel').textContent = level;
+    document.getElementById('statLen').textContent = seq.length || 1;
+    document.getElementById('statBest').textContent = best;
+    document.getElementById('progText').textContent = `المرحلة ${level}`;
+    document.getElementById('progFill').style.width = Math.min((level / 20) * 100, 100) + '%';
+  }
+
+  function renderLives() {
+    document.querySelectorAll('.heart').forEach((h, i) => h.classList.toggle('lost', i >= lives));
+  }
+
+  function lockInput(lock) {
+    const g = document.getElementById('inputGroup');
+    g.style.opacity = lock ? '0.3' : '1';
+    g.style.pointerEvents = lock ? 'none' : 'all';
+  }
+
+  function showFeedback(msg, type) {
+    const el = document.getElementById('feedbackEl');
+    el.textContent = msg;
+    el.className = `feedback ${type} show`;
+  }
+
+  function clearFeedback() {
+    document.getElementById('feedbackEl').className = 'feedback';
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && phase === 'input') checkAnswer();
+  });
+</script>
+
+</body>
+</html>
