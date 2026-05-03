@@ -767,13 +767,8 @@ margin-bottom: 24px;
 
   function filterInput(inp) {
     inp.value = inp.value.replace(/[^0-9]/g, '');
-    // حد الإدخال بعدد الأرقام المطلوبة
     if (inp.value.length > seq.length) {
       inp.value = inp.value.slice(0, seq.length);
-    }
-    // لو اكتملت الأرقام تحقق تلقائياً
-    if (inp.value.length === seq.length) {
-      setTimeout(() => checkAnswer(), 300);
     }
   }
 
