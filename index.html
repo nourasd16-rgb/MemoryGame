@@ -255,6 +255,10 @@ color: #00e5ff;
 text-shadow: 0 0 40px rgba(0,229,255,0.5);
 letter-spacing: 10px;
 animation: popIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+word-break: break-all;
+text-align: center;
+padding: 0 10px;
+max-width: 100%;
 }
 
 .display-msg {
@@ -743,8 +747,15 @@ margin-bottom: 24px;
     const el = document.getElementById('displayEl');
     if (isNum) {
       el.className = 'display-num';
+      // حجم الخط يتكيف مع طول التسلسل
+      const len = seq.length;
+      if (len <= 4) el.style.fontSize = '3rem';
+      else if (len <= 7) el.style.fontSize = '2.2rem';
+      else if (len <= 10) el.style.fontSize = '1.6rem';
+      else el.style.fontSize = '1.2rem';
     } else {
       el.className = 'display-msg';
+      el.style.fontSize = '';
     }
     // لابل
     const box = document.getElementById('displayBox');
@@ -756,6 +767,14 @@ margin-bottom: 24px;
 
   function filterInput(inp) {
     inp.value = inp.value.replace(/[^0-9]/g, '');
+    // حد الإدخال بعدد الأرقام المطلوبة
+    if (inp.value.length > seq.length) {
+      inp.value = inp.value.slice(0, seq.length);
+    }
+    // لو اكتملت الأرقام تحقق تلقائياً
+    if (inp.value.length === seq.length) {
+      setTimeout(() => checkAnswer(), 300);
+    }
   }
 
   function flashDisplay(type) {
