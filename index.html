@@ -759,11 +759,21 @@ margin-bottom: 24px;
   }
 
   function flashDisplay(type) {
-    const input = document.getElementById('userInput');
-    input.classList.add(type === 'correct' ? 'flash-correct' : 'flash-wrong');
+    const wrapper = document.querySelector('#inputGroup > div');
+    if (type === 'correct') {
+      wrapper.style.background = 'rgba(0,255,120,0.25)';
+      wrapper.style.borderColor = 'rgba(0,255,120,0.7)';
+      wrapper.style.boxShadow = '0 0 20px rgba(0,255,120,0.3)';
+    } else {
+      wrapper.style.background = 'rgba(255,60,60,0.25)';
+      wrapper.style.borderColor = 'rgba(255,60,60,0.7)';
+      wrapper.style.boxShadow = '0 0 20px rgba(255,60,60,0.3)';
+    }
     setTimeout(() => {
-      input.classList.remove('flash-correct', 'flash-wrong');
-    }, 600);
+      wrapper.style.background = '#1a1a2e';
+      wrapper.style.borderColor = 'rgba(0,229,255,0.15)';
+      wrapper.style.boxShadow = 'none';
+    }, 700);
   }
 
   function checkAnswer() {
