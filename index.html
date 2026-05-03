@@ -6,25 +6,23 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>لعبة تذكر الأرقام</title>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<title>MEMORY MODE</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --cyan: #00e5ff;
-    --purple: #8b5cf6;
-    --bg: #070710;
-    --card: rgba(255,255,255,0.04);
-    --border: rgba(255,255,255,0.08);
-    --text: #e8eaf0;
-    --muted: rgba(255,255,255,0.35);
-  }
+* { margin:0; padding:0; box-sizing:border-box; }
 
-- { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+–cyan: #00e5ff;
+–purple: #7c3aed;
+–pink: #f472b6;
+–bg: #07070f;
+–card: rgba(255,255,255,0.04);
+}
 
 body {
-font-family: ‘Tajawal’, sans-serif;
-background: #070710;
-color: #e8eaf0;
+font-family: ‘Space Grotesk’, ‘Tajawal’, sans-serif;
+background: #07070f;
+color: #fff;
 min-height: 100vh;
 display: flex;
 align-items: center;
@@ -32,665 +30,620 @@ justify-content: center;
 overflow: hidden;
 }
 
-/* خلفية متحركة */
-.bg {
-position: fixed;
-inset: 0;
-z-index: 0;
-overflow: hidden;
-}
-.bg::before {
-content: ‘’;
-position: absolute;
-width: 600px; height: 600px;
-border-radius: 50%;
-background: radial-gradient(circle, rgba(0,229,255,0.07) 0%, transparent 70%);
-top: -200px; left: 50%;
-transform: translateX(-50%);
-animation: breathe 6s ease-in-out infinite;
-}
-.bg::after {
-content: ‘’;
-position: absolute;
-width: 500px; height: 500px;
-border-radius: 50%;
-background: radial-gradient(circle, rgba(139,92,246,0.07) 0%, transparent 70%);
-bottom: -150px; right: -100px;
-animation: breathe 8s ease-in-out infinite reverse;
-}
-@keyframes breathe {
-0%, 100% { transform: translateX(-50%) scale(1); }
-50% { transform: translateX(-50%) scale(1.15); }
+/* خلفية */
+.bg-layer {
+position: fixed; inset: 0; z-index: 0;
+background:
+radial-gradient(ellipse 60% 40% at 50% 0%, rgba(0,229,255,0.06) 0%, transparent 70%),
+radial-gradient(ellipse 50% 40% at 80% 100%, rgba(124,58,237,0.08) 0%, transparent 70%);
 }
 
-/* نقاط الشبكة */
-.dots {
-position: fixed;
-inset: 0;
-background-image: radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px);
-background-size: 32px 32px;
-pointer-events: none;
-z-index: 0;
+.grid-bg {
+position: fixed; inset: 0; z-index: 0;
+background-image:
+linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+background-size: 48px 48px;
 }
 
 .wrap {
-position: relative;
-z-index: 1;
-width: 100%;
-max-width: 420px;
-padding: 20px;
+position: relative; z-index: 1;
+width: 100%; max-width: 400px;
+padding: 24px 20px;
 }
 
-/* ===== هيدر ===== */
-.header {
+/* ===== SCREENS ===== */
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* ===== START SCREEN ===== */
+.start-logo {
 text-align: center;
-margin-bottom: 28px;
+margin-bottom: 40px;
 }
 
-.logo {
+.logo-mark {
 display: inline-flex;
-align-items: center;
-gap: 10px;
-margin-bottom: 6px;
-}
-
-.logo-icon {
-width: 44px; height: 44px;
-background: linear-gradient(135deg, #00e5ff, #8b5cf6);
-border-radius: 14px;
-display: flex;
-align-items: center;
-justify-content: center;
-font-size: 1.4rem;
-box-shadow: 0 0 20px rgba(0,229,255,0.25);
-}
-
-h1 {
-font-size: 1.7rem;
-font-weight: 900;
-background: linear-gradient(135deg, #fff 30%, #00e5ff);
--webkit-background-clip: text;
--webkit-text-fill-color: transparent;
-}
-
-.tagline {
-color: rgba(255,255,255,0.45);
-font-size: 0.88rem;
-}
-
-/* ===== بطاقة ===== */
-.card {
-background: rgba(255,255,255,0.06);
-border: 1px solid rgba(255,255,255,0.1);
-border-radius: 24px;
-padding: 24px;
-backdrop-filter: blur(10px);
-margin-bottom: 14px;
-}
-
-/* ===== إحصائيات ===== */
-.stats {
-display: grid;
-grid-template-columns: 1fr 1fr 1fr;
-gap: 10px;
+gap: 4px;
 margin-bottom: 20px;
 }
 
-.stat {
+.logo-bar {
+width: 8px;
+border-radius: 4px;
+background: linear-gradient(180deg, #00e5ff, #7c3aed);
+box-shadow: 0 0 10px rgba(0,229,255,0.5);
+}
+
+.logo-bar:nth-child(1) { height: 24px; }
+.logo-bar:nth-child(2) { height: 36px; }
+.logo-bar:nth-child(3) { height: 28px; }
+.logo-bar:nth-child(4) { height: 42px; }
+.logo-bar:nth-child(5) { height: 20px; }
+
+.game-title { direction: ltr; unicode-bidi: embed;
+font-family: ‘Space Grotesk’, sans-serif;
+font-size: 2.2rem;
+font-weight: 700;
+letter-spacing: 6px;
+text-transform: uppercase;
+background: linear-gradient(135deg, #fff 0%, #00e5ff 60%, #7c3aed 100%);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+margin-bottom: 8px;
+}
+
+.game-subtitle { direction: ltr; unicode-bidi: embed;
+font-size: 0.8rem;
+color: rgba(255,255,255,0.3);
+letter-spacing: 2px;
+text-transform: uppercase;
+}
+
+/* بطاقة التعليمات */
+.rules-card {
 background: rgba(255,255,255,0.03);
-border: 1px solid rgba(255,255,255,0.1);
-border-radius: 16px;
-padding: 12px 8px;
-text-align: center;
-}
-
-.stat-val {
-font-size: 1.5rem;
-font-weight: 900;
-color: #00e5ff;
-line-height: 1;
-margin-bottom: 4px;
-}
-
-.stat-lbl {
-font-size: 0.7rem;
-color: rgba(255,255,255,0.45);
-font-weight: 500;
-}
-
-/* ===== حياة ===== */
-.lives {
-display: flex;
-justify-content: center;
-gap: 10px;
-margin-bottom: 18px;
-}
-
-.heart {
-width: 28px;
-height: 26px;
+border: 1px solid rgba(255,255,255,0.07);
+border-radius: 20px;
+padding: 24px;
+margin-bottom: 28px;
 position: relative;
-transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-image-rendering: pixelated;
+overflow: hidden;
 }
 
-.heart svg {
+.rules-card::before {
+content: ‘’;
+position: absolute;
+top: 0; left: 0; right: 0;
+height: 1px;
+background: linear-gradient(90deg, transparent, rgba(0,229,255,0.4), transparent);
+}
+
+.rule-line {
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 10px 0;
+border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.rule-line:last-child { border-bottom: none; }
+
+.rule-num {
+width: 24px; height: 24px;
+border-radius: 6px;
+background: linear-gradient(135deg, rgba(0,229,255,0.2), rgba(124,58,237,0.2));
+border: 1px solid rgba(0,229,255,0.3);
+display: flex; align-items: center; justify-content: center;
+font-size: 0.72rem;
+font-weight: 700;
+color: #00e5ff;
+flex-shrink: 0;
+font-family: ‘Space Grotesk’, sans-serif;
+}
+
+.rule-text {
+font-size: 0.88rem;
+color: rgba(255,255,255,0.6);
+letter-spacing: 0.5px;
+}
+
+/* زر PLAY */
+.btn-play {
 width: 100%;
-height: 100%;
-filter: drop-shadow(0 0 6px rgba(255,60,80,0.7));
+padding: 18px;
+background: linear-gradient(135deg, #00e5ff, #7c3aed);
+border: none;
+border-radius: 16px;
+font-family: ‘Space Grotesk’, sans-serif;
+font-size: 1rem;
+font-weight: 700;
+letter-spacing: 4px;
+color: #fff;
+cursor: pointer;
+position: relative;
+overflow: hidden;
+box-shadow: 0 0 30px rgba(0,229,255,0.25), 0 0 60px rgba(124,58,237,0.15);
+animation: pulse-btn 2.5s ease-in-out infinite;
+transition: transform 0.15s;
 }
 
-.heart.lost svg {
-filter: none;
-}
-.heart.lost svg .heart-fill {
-fill: #2a2a3a;
-}
-.heart.lost svg .heart-shade {
-fill: #1a1a2a;
-}
-.heart.lost {
-transform: scale(0.85);
-opacity: 0.5;
+.btn-play:active { transform: scale(0.97); }
+
+@keyframes pulse-btn {
+0%, 100% { box-shadow: 0 0 30px rgba(0,229,255,0.25), 0 0 60px rgba(124,58,237,0.15); }
+50% { box-shadow: 0 0 50px rgba(0,229,255,0.45), 0 0 80px rgba(124,58,237,0.3); }
 }
 
-/* ===== شاشة العرض ===== */
-.display {
+/* ===== GAME SCREEN ===== */
+.hud {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 24px;
+}
+
+.hud-block {
+background: rgba(255,255,255,0.04);
+border: 1px solid rgba(255,255,255,0.07);
+border-radius: 12px;
+padding: 10px 16px;
+text-align: center;
+min-width: 80px;
+}
+
+.hud-label {
+font-size: 0.62rem;
+color: rgba(255,255,255,0.3);
+letter-spacing: 2px;
+text-transform: uppercase;
+margin-bottom: 3px;
+}
+
+.hud-val {
+font-family: ‘Space Grotesk’, sans-serif;
+font-size: 1.4rem;
+font-weight: 700;
+color: #00e5ff;
+}
+
+/* حياة */
+.lives-wrap {
+display: flex;
+gap: 6px;
+align-items: center;
+}
+
+.life-seg {
+width: 28px;
+height: 6px;
+border-radius: 3px;
+background: linear-gradient(90deg, #00e5ff, #7c3aed);
+box-shadow: 0 0 8px rgba(0,229,255,0.5);
+transition: all 0.3s;
+}
+
+.life-seg.lost {
+background: rgba(255,255,255,0.08);
+box-shadow: none;
+}
+
+/* مربع العرض */
+.display-box {
 background: rgba(0,229,255,0.03);
 border: 1px solid rgba(0,229,255,0.12);
 border-radius: 20px;
-min-height: 110px;
+min-height: 130px;
 display: flex;
 flex-direction: column;
 align-items: center;
 justify-content: center;
-margin-bottom: 18px;
+margin-bottom: 16px;
 position: relative;
 overflow: hidden;
-transition: background 0.3s, border-color 0.3s;
+transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
 }
 
-.display.flash-correct {
-background: rgba(0,229,255,0.03);
-border-color: rgba(0,229,255,0.12);
-}
-
-.display.flash-wrong {
-background: rgba(0,229,255,0.03);
-border-color: rgba(0,229,255,0.12);
-}
-
-input.flash-correct {
-background: rgba(0,255,120,0.12) !important;
-border-color: rgba(0,255,120,0.5) !important;
-box-shadow: 0 0 16px rgba(0,255,120,0.2) !important;
-}
-
-input.flash-wrong {
-background: rgba(255,60,60,0.12) !important;
-border-color: rgba(255,60,60,0.5) !important;
-box-shadow: 0 0 16px rgba(255,60,60,0.2) !important;
-}
-
-.display::before {
+.display-box::after {
 content: ‘’;
 position: absolute;
-inset: 0;
-background: linear-gradient(135deg, rgba(0,229,255,0.04), transparent 60%);
+top: 0; left: 0; right: 0;
+height: 1px;
+background: linear-gradient(90deg, transparent, rgba(0,229,255,0.3), transparent);
 }
 
-.display-label {
-font-size: 0.72rem;
-color: rgba(255,255,255,0.45);
-font-weight: 500;
-letter-spacing: 1.5px;
+.display-box.flash-correct {
+background: rgba(0,255,120,0.1);
+border-color: rgba(0,255,120,0.4);
+box-shadow: 0 0 30px rgba(0,255,120,0.15);
+}
+
+.display-box.flash-wrong {
+background: rgba(255,60,60,0.1);
+border-color: rgba(255,60,60,0.4);
+box-shadow: 0 0 30px rgba(255,60,60,0.15);
+animation: shake 0.35s ease;
+}
+
+@keyframes shake {
+0%,100% { transform: translateX(0); }
+20% { transform: translateX(-8px); }
+40% { transform: translateX(8px); }
+60% { transform: translateX(-5px); }
+80% { transform: translateX(5px); }
+}
+
+.display-sublabel {
+font-size: 0.62rem;
+color: rgba(255,255,255,0.25);
+letter-spacing: 2.5px;
 text-transform: uppercase;
 margin-bottom: 8px;
 }
 
-.display-num {
-font-size: 3rem;
-font-weight: 900;
+.display-number { direction: ltr; unicode-bidi: embed;
+font-family: ‘Space Grotesk’, sans-serif;
+font-size: 3.5rem;
+font-weight: 700;
 color: #00e5ff;
-text-shadow: 0 0 40px rgba(0,229,255,0.5);
-letter-spacing: 10px;
-animation: popIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-word-break: break-all;
-text-align: center;
-padding: 0 10px;
-max-width: 100%;
+text-shadow: 0 0 40px rgba(0,229,255,0.6);
+animation: numPop 0.2s cubic-bezier(0.34,1.56,0.64,1);
+letter-spacing: 4px;
 }
 
-.display-msg {
-font-size: 1.05rem;
-color: rgba(255,255,255,0.5);
-}
-
-@keyframes popIn {
-from { transform: scale(0.6); opacity: 0; }
+@keyframes numPop {
+from { transform: scale(0.5); opacity: 0; }
 to { transform: scale(1); opacity: 1; }
 }
 
-/* ===== شريط تقدم ===== */
-.progress-wrap {
-margin-bottom: 18px;
+.display-text { direction: ltr; unicode-bidi: embed;
+font-size: 0.95rem;
+color: rgba(255,255,255,0.35);
+letter-spacing: 2px;
+text-transform: uppercase;
 }
-.progress-label {
+
+/* شريط التقدم */
+.progress-wrap { margin-bottom: 20px; }
+
+.progress-top {
 display: flex;
 justify-content: space-between;
-font-size: 0.72rem;
-color: rgba(255,255,255,0.45);
+font-size: 0.65rem;
+color: rgba(255,255,255,0.25);
+letter-spacing: 1.5px;
+text-transform: uppercase;
 margin-bottom: 6px;
 }
-.progress-bar {
-height: 4px;
-background: rgba(255,255,255,0.06);
+
+.progress-track {
+height: 3px;
+background: rgba(255,255,255,0.05);
 border-radius: 99px;
 overflow: hidden;
 }
+
 .progress-fill {
 height: 100%;
-background: linear-gradient(90deg, #00e5ff, #8b5cf6);
+background: linear-gradient(90deg, #00e5ff, #7c3aed);
 border-radius: 99px;
 transition: width 0.5s ease;
-box-shadow: 0 0 8px rgba(0,229,255,0.4);
+box-shadow: 0 0 6px rgba(0,229,255,0.4);
 }
 
-/* ===== إدخال ===== */
-.input-group {
-display: flex;
-flex-direction: column;
-gap: 10px;
-margin-bottom: 14px;
+/* خانة الإدخال */
+.input-wrap {
+margin-bottom: 12px;
+transition: opacity 0.3s;
 }
 
-input[type=“text”] {
-flex: 1;
+.input-box {
 width: 100%;
-min-height: 56px;
-background: #1a1a2e !important;
-border: 1.5px solid rgba(255,255,255,0.15);
+background: #0f0f1e;
+border: 1.5px solid rgba(255,255,255,0.1);
 border-radius: 16px;
-padding: 16px 20px;
-font-size: 1.5rem;
-font-family: ‘Tajawal’, sans-serif;
-font-weight: 700;
-color: #ffffff !important;
-text-align: center;
-letter-spacing: 8px;
-outline: none;
-transition: all 0.25s;
--webkit-appearance: none;
-appearance: none;
-box-sizing: border-box;
-}
-input[type=“text”]:focus {
-border-color: rgba(0,229,255,0.6);
-background: #1a1a2e !important;
-box-shadow: 0 0 0 3px rgba(0,229,255,0.12);
-}
-input[type=“text”]::placeholder {
-color: rgba(255,255,255,0.3);
-font-size: 0.9rem;
-letter-spacing: 1px;
-}
-input:disabled {
-opacity: 0.4;
-}
-
-/* ===== أزرار ===== */
-.btn {
-border: none;
-font-family: ‘Tajawal’, sans-serif;
-font-weight: 700;
-cursor: pointer;
-transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+min-height: 70px;
+display: flex;
+align-items: center;
+justify-content: center;
+margin-bottom: 10px;
+transition: border-color 0.3s, background 0.3s, box-shadow 0.3s;
 position: relative;
 overflow: hidden;
 }
 
-.btn::after {
+.input-box::after {
 content: ‘’;
 position: absolute;
-inset: 0;
-background: rgba(255,255,255,0);
-transition: background 0.2s;
+bottom: 0; left: 0; right: 0;
+height: 1px;
+background: linear-gradient(90deg, transparent, rgba(0,229,255,0.2), transparent);
 }
-.btn:hover::after { background: rgba(255,255,255,0.08); }
-.btn:active { transform: scale(0.96); }
 
-.btn-confirm {
-width: 100%;
-height: 50px;
-background: linear-gradient(135deg, #00e5ff, #0099bb);
-border-radius: 16px;
-font-size: 1.1rem;
-color: #000;
-font-weight: 900;
-box-shadow: 0 4px 16px rgba(0,229,255,0.3);
-letter-spacing: 1px;
+.input-box.active {
+border-color: rgba(0,229,255,0.35);
+box-shadow: 0 0 20px rgba(0,229,255,0.08);
 }
-.btn-confirm:hover { box-shadow: 0 6px 24px rgba(0,229,255,0.45); }
 
-.btn-start {
-width: 100%;
-padding: 17px;
-font-size: 1.1rem;
-border-radius: 18px;
-background: linear-gradient(135deg, #00e5ff 0%, #8b5cf6 100%);
+.input-box.flash-correct {
+background: rgba(0,255,120,0.1);
+border-color: rgba(0,255,120,0.5);
+box-shadow: 0 0 20px rgba(0,255,120,0.2);
+}
+
+.input-box.flash-wrong {
+background: rgba(255,60,60,0.1);
+border-color: rgba(255,60,60,0.5);
+box-shadow: 0 0 20px rgba(255,60,60,0.2);
+animation: shake 0.35s ease;
+}
+
+.real-input {
+position: absolute;
+width: 100%; height: 100%;
+opacity: 0;
+font-size: 16px;
+border: none;
+outline: none;
+background: transparent;
+cursor: pointer;
+z-index: 2;
+}
+
+.input-display { direction: ltr; unicode-bidi: embed;
+font-family: ‘Space Grotesk’, sans-serif;
+font-size: 2rem;
+font-weight: 700;
 color: #fff;
-letter-spacing: 0.5px;
-box-shadow: 0 4px 24px rgba(0,229,255,0.25);
-margin-bottom: 12px;
+letter-spacing: 10px;
+z-index: 1;
 }
-.btn-start:hover { box-shadow: 0 8px 32px rgba(0,229,255,0.4); }
 
+.input-placeholder {
+font-size: 0.78rem;
+color: rgba(255,255,255,0.2);
+letter-spacing: 3px;
+text-transform: uppercase;
+z-index: 1;
+}
+
+/* زر ENTER */
+.btn-enter {
+width: 100%;
+padding: 16px;
+background: linear-gradient(135deg, #00e5ff, #0099cc);
+border: none;
+border-radius: 14px;
+font-family: ‘Space Grotesk’, sans-serif;
+font-size: 0.9rem;
+font-weight: 700;
+letter-spacing: 4px;
+color: #000;
+cursor: pointer;
+box-shadow: 0 4px 20px rgba(0,229,255,0.25);
+transition: all 0.15s;
+}
+
+.btn-enter:active { transform: scale(0.97); }
+.btn-enter:disabled { opacity: 0.3; pointer-events: none; }
+
+/* زر ثانوي */
 .btn-ghost {
 width: 100%;
-padding: 14px;
-font-size: 0.95rem;
-border-radius: 16px;
+padding: 13px;
 background: transparent;
-border: 1.5px solid rgba(255,255,255,0.1);
-color: rgba(255,255,255,0.45);
-}
-.btn-ghost:hover { border-color: rgba(255,255,255,0.2); color: #e8eaf0; }
-
-/* ===== ردود الفعل ===== */
-.feedback {
-border-radius: 14px;
-padding: 12px 16px;
-font-size: 0.95rem;
-font-weight: 700;
-text-align: center;
-margin-bottom: 14px;
-opacity: 0;
-transform: translateY(-6px);
-transition: all 0.3s;
-display: none;
-}
-.feedback.show {
-opacity: 1;
-transform: translateY(0);
-display: block;
-}
-.feedback.correct {
-background: rgba(0,255,120,0.08);
-border: 1px solid rgba(0,255,120,0.2);
-color: #00e676;
-}
-.feedback.wrong {
-background: rgba(255,82,82,0.08);
-border: 1px solid rgba(255,82,82,0.2);
-color: #ff5252;
-}
-
-/* ===== تعليمات ===== */
-.instructions {
-border-radius: 18px;
-overflow: hidden;
-margin-bottom: 16px;
-}
-
-.step {
-display: flex;
-align-items: flex-start;
-gap: 14px;
-padding: 14px 16px;
-border-bottom: 1px solid rgba(255,255,255,0.1);
-background: rgba(255,255,255,0.025);
-transition: background 0.2s;
-}
-.step:last-child { border-bottom: none; }
-.step:hover { background: rgba(255,255,255,0.04); }
-
-.step-num {
-width: 30px; height: 30px;
-border-radius: 10px;
-background: linear-gradient(135deg, #00e5ff, #8b5cf6);
-display: flex;
-align-items: center;
-justify-content: center;
-font-size: 0.8rem;
-font-weight: 900;
-color: #fff;
-flex-shrink: 0;
-box-shadow: 0 2px 8px rgba(0,229,255,0.2);
-}
-
-.step-text {
-padding-top: 4px;
-}
-.step-title {
-font-size: 0.92rem;
-font-weight: 700;
-color: #e8eaf0;
-margin-bottom: 2px;
-}
-.step-desc {
+border: 1px solid rgba(255,255,255,0.08);
+border-radius: 12px;
+font-family: ‘Space Grotesk’, sans-serif;
 font-size: 0.78rem;
-color: rgba(255,255,255,0.45);
-line-height: 1.5;
+font-weight: 700;
+letter-spacing: 2px;
+color: rgba(255,255,255,0.3);
+cursor: pointer;
+transition: all 0.2s;
+margin-top: 10px;
+text-transform: uppercase;
 }
 
-/* ===== شاشة انتهاء ===== */
-.result-icon {
-font-size: 3.5rem;
-text-align: center;
-margin-bottom: 12px;
-animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.result-title {
-text-align: center;
-font-size: 1.5rem;
-font-weight: 900;
-margin-bottom: 6px;
-}
-.result-sub {
-text-align: center;
-color: rgba(255,255,255,0.45);
-font-size: 0.88rem;
+.btn-ghost:hover { border-color: rgba(255,255,255,0.15); color: rgba(255,255,255,0.5); }
+
+/* ===== RESULT SCREEN ===== */
+.result-wrap { text-align: center; padding: 40px 0 20px; }
+
+.result-tag {
+display: inline-block;
+font-family: ‘Space Grotesk’, sans-serif;
+font-size: 0.7rem;
+letter-spacing: 3px;
+text-transform: uppercase;
+color: rgba(255,255,255,0.3);
+border: 1px solid rgba(255,255,255,0.08);
+border-radius: 99px;
+padding: 5px 16px;
 margin-bottom: 20px;
 }
-.result-score {
-text-align: center;
-font-size: 3.5rem;
-font-weight: 900;
-color: #00e5ff;
-text-shadow: 0 0 30px rgba(0,229,255,0.4);
-line-height: 1;
-margin-bottom: 4px;
-}
-.result-best {
-text-align: center;
-color: rgba(255,255,255,0.45);
-font-size: 0.85rem;
-margin-bottom: 24px;
-}
-.result-best span { color: #00e5ff; font-weight: 700; }
 
+.result-title {
+font-family: ‘Space Grotesk’, sans-serif;
+font-size: 2rem;
+font-weight: 700;
+letter-spacing: 3px;
+text-transform: uppercase;
+margin-bottom: 32px;
+}
+
+.result-scores {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 12px;
+margin-bottom: 32px;
+}
+
+.result-score-box {
+background: rgba(255,255,255,0.04);
+border: 1px solid rgba(255,255,255,0.07);
+border-radius: 16px;
+padding: 20px 12px;
+}
+
+.result-score-label {
+font-size: 0.62rem;
+color: rgba(255,255,255,0.3);
+letter-spacing: 2px;
+text-transform: uppercase;
+margin-bottom: 6px;
+}
+
+.result-score-val {
+font-family: ‘Space Grotesk’, sans-serif;
+font-size: 2.2rem;
+font-weight: 700;
+color: #00e5ff;
+text-shadow: 0 0 20px rgba(0,229,255,0.4);
+}
+
+/* العد التنازلي داخل مربع العرض */
+.countdown-svg {
+display: none;
+}
+
+/* إخفاء */
 .hidden { display: none !important; }
 </style>
 
 </head>
 <body>
-
-<div class="bg"></div>
-<div class="dots"></div>
+<div class="bg-layer"></div>
+<div class="grid-bg"></div>
 
 <div class="wrap">
 
-  <!-- شاشة البداية -->
+  <!-- START SCREEN -->
 
-  <div id="startScreen">
-    <div class="header">
-      <div class="logo">
-        <div class="logo-icon"><svg viewBox="0 0 14 14" width="26" height="26" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="0" width="2" height="2" fill="#fff"/><rect x="5" y="2" width="4" height="2" fill="#fff"/><rect x="0" y="4" width="14" height="2" fill="#fff"/><rect x="2" y="6" width="10" height="2" fill="#fff"/><rect x="3" y="8" width="8" height="2" fill="#fff"/><rect x="2" y="10" width="2" height="2" fill="#fff"/><rect x="10" y="10" width="2" height="2" fill="#fff"/><rect x="1" y="12" width="3" height="2" fill="#fff"/><rect x="10" y="12" width="3" height="2" fill="#fff"/></svg></div>
-        <h1>تذكّر الأرقام</h1>
+  <div id="startScreen" class="screen active">
+    <div class="start-logo">
+      <div class="logo-mark">
+        <div class="logo-bar"></div>
+        <div class="logo-bar"></div>
+        <div class="logo-bar"></div>
+        <div class="logo-bar"></div>
+        <div class="logo-bar"></div>
       </div>
-      <p class="tagline">اختبر ذاكرتك — كل مرحلة تحدٍّ جديد</p>
+      <div class="game-title" dir="ltr">MEMORY MODE</div>
+      <div class="game-subtitle" dir="ltr">How far can your memory go?</div>
     </div>
 
 ```
-<div class="card">
-  <div class="instructions">
-    <div class="step">
-      <div class="step-num">1</div>
-      <div class="step-text">
-        <div class="step-title">شاهد الأرقام</div>
-        <div class="step-desc">ستظهر الأرقام واحداً تلو الآخر لثوانٍ قصيرة</div>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">2</div>
-      <div class="step-text">
-        <div class="step-title">تذكّر التسلسل</div>
-        <div class="step-desc">احفظ ترتيب الأرقام في ذهنك بدقة</div>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">3</div>
-      <div class="step-text">
-        <div class="step-title">أدخل الإجابة</div>
-        <div class="step-desc">اكتب الأرقام بنفس الترتيب الذي رأيته</div>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">4</div>
-      <div class="step-text">
-        <div class="step-title">تقدّم في المراحل</div>
-        <div class="step-desc">كل مرحلة يُضاف رقم جديد — عندك 3 محاولات</div>
-      </div>
-    </div>
+<div class="rules-card">
+  <div class="rule-line">
+    <div class="rule-text">شاهد الأرقام بتركيز</div>
   </div>
-  <button class="btn btn-start" onclick="startGame()">ابدأ اللعبة</button>
-</div>
-```
-
+  <div class="rule-line">
+    <div class="rule-text">تذكّر الترتيب بدقة</div>
   </div>
-
-  <!-- شاشة اللعبة -->
-
-  <div id="gameScreen" class="hidden">
-    <div class="header">
-      <div class="logo">
-        <div class="logo-icon"><svg viewBox="0 0 14 14" width="26" height="26" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="0" width="2" height="2" fill="#fff"/><rect x="5" y="2" width="4" height="2" fill="#fff"/><rect x="0" y="4" width="14" height="2" fill="#fff"/><rect x="2" y="6" width="10" height="2" fill="#fff"/><rect x="3" y="8" width="8" height="2" fill="#fff"/><rect x="2" y="10" width="2" height="2" fill="#fff"/><rect x="10" y="10" width="2" height="2" fill="#fff"/><rect x="1" y="12" width="3" height="2" fill="#fff"/><rect x="10" y="12" width="3" height="2" fill="#fff"/></svg></div>
-        <h1>تذكّر الأرقام</h1>
-      </div>
-    </div>
-
-```
-<div class="card">
-  <div class="stats">
-    <div class="stat">
-      <div class="stat-val" id="statLevel">1</div>
-      <div class="stat-lbl">المرحلة</div>
-    </div>
-    <div class="stat">
-      <div class="stat-val" id="statLen">1</div>
-      <div class="stat-lbl">طول التسلسل</div>
-    </div>
-    <div class="stat">
-      <div class="stat-val" id="statBest">0</div>
-      <div class="stat-lbl">أعلى نقطة</div>
-    </div>
+  <div class="rule-line">
+    <div class="rule-text">أدخل الأرقام بنفس الترتيب</div>
   </div>
-
-<div class="lives" id="livesEl">
-  <span class="heart"><svg viewBox="0 0 16 14" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
-    <rect class="heart-fill" x="1" y="0" width="3" height="1" fill="#ff2244"/>
-    <rect class="heart-fill" x="6" y="0" width="3" height="1" fill="#ff2244"/>
-    <rect class="heart-fill" x="0" y="1" width="5" height="1" fill="#ff2244"/>
-    <rect class="heart-fill" x="5" y="1" width="1" height="1" fill="#ff6680"/>
-    <rect class="heart-fill" x="6" y="1" width="3" height="1" fill="#ff2244"/>
-    <rect class="heart-fill" x="0" y="2" width="9" height="1" fill="#ff2244"/>
-    <rect class="heart-shade" x="1" y="2" width="2" height="1" fill="#ff6680"/>
-    <rect class="heart-fill" x="0" y="3" width="9" height="1" fill="#ff2244"/>
-    <rect class="heart-fill" x="1" y="4" width="7" height="1" fill="#ff2244"/>
-    <rect class="heart-fill" x="2" y="5" width="5" height="1" fill="#ff2244"/>
-    <rect class="heart-fill" x="3" y="6" width="3" height="1" fill="#ff2244"/>
-    <rect class="heart-fill" x="4" y="7" width="1" height="1" fill="#ff2244"/>
-    <!-- scaled x2 -->
-  </svg></span>
-  <span class="heart"><svg viewBox="0 0 16 14" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
-    <rect class="heart-fill" x="1" y="0" width="3" height="1" fill="#ff2244"/>
-    <rect class="heart-fill" x="6" y="0" width="3" height="1" fill="#ff2244"/>
-    <rect class="heart-fill" x="0" y="1" width="5" height="1" fill="#ff2244"/>
-    <rect class="heart-fill" x="5" y="1" width="1" height="1" fill="#ff6680"/>
-    <rect class="heart-fill" x="6" y="1" width="3" height="1" fill="#ff2244"/>
-    <rect class="heart-fill" x="0" y="2" width="9" height="1" fill="#ff2244"/>
-    <rect class="heart-shade" x="1" y="2" width="2" height="1" fill="#ff6680"/>
-    <rect class="heart-fill" x="0" y="3" width="9" height="1" fill="#ff2244"/>
-    <rect class="heart-fill" x="1" y="4" width="7" height="1" fill="#ff2244"/>
-    <rect class="heart-fill" x="2" y="5" width="5" height="1" fill="#ff2244"/>
-    <rect class="heart-fill" x="3" y="6" width="3" height="1" fill="#ff2244"/>
-    <rect class="heart-fill" x="4" y="7" width="1" height="1" fill="#ff2244"/>
-  </svg></span>
-  <span class="heart"><svg viewBox="0 0 16 14" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
-    <rect class="heart-fill" x="1" y="0" width="3" height="1" fill="#ff2244"/>
-    <rect class="heart-fill" x="6" y="0" width="3" height="1" fill="#ff2244"/>
-    <rect class="heart-fill" x="0" y="1" width="5" height="1" fill="#ff2244"/>
-    <rect class="heart-fill" x="5" y="1" width="1" height="1" fill="#ff6680"/>
-    <rect class="heart-fill" x="6" y="1" width="3" height="1" fill="#ff2244"/>
-    <rect class="heart-fill" x="0" y="2" width="9" height="1" fill="#ff2244"/>
-    <rect class="heart-shade" x="1" y="2" width="2" height="1" fill="#ff6680"/>
-    <rect class="heart-fill" x="0" y="3" width="9" height="1" fill="#ff2244"/>
-    <rect class="heart-fill" x="1" y="4" width="7" height="1" fill="#ff2244"/>
-    <rect class="heart-fill" x="2" y="5" width="5" height="1" fill="#ff2244"/>
-    <rect class="heart-fill" x="3" y="6" width="3" height="1" fill="#ff2244"/>
-    <rect class="heart-fill" x="4" y="7" width="1" height="1" fill="#ff2244"/>
-  </svg></span>
+  <div class="rule-line">
+    <div class="rule-text">عندك 3 محاولات فقط</div>
+  </div>
 </div>
 
-  <div class="progress-wrap">
-    <div class="progress-label">
-      <span>التقدم</span>
-      <span id="progText">المرحلة 1</span>
-    </div>
-    <div class="progress-bar">
-      <div class="progress-fill" id="progFill" style="width:5%"></div>
+<button class="btn-play" onclick="startGame()" dir="ltr">PLAY</button>
+```
+
+  </div>
+
+  <!-- GAME SCREEN -->
+
+  <div id="gameScreen" class="screen">
+
+```
+<div class="hud">
+  <div class="hud-block">
+    <div class="hud-label" dir="ltr">LEVEL</div>
+    <div class="hud-val" id="hudLevel">1</div>
+  </div>
+
+  <div>
+    <div style="font-size:0.6rem;color:rgba(255,255,255,0.25);letter-spacing:2px;text-align:center;margin-bottom:6px;">LIVES</div>
+    <div class="lives-wrap" id="livesEl">
+      <div class="life-seg"></div>
+      <div class="life-seg"></div>
+      <div class="life-seg"></div>
     </div>
   </div>
 
-  <div class="display" id="displayBox">
-    <div class="display-msg" id="displayEl">جاهز للبدء...</div>
+  <div class="hud-block">
+    <div class="hud-label" dir="ltr">BEST</div>
+    <div class="hud-val" id="hudBest">0</div>
   </div>
-
-  <div class="feedback" id="feedbackEl"></div>
-
-  <div class="input-group" id="inputGroup" style="opacity:0.3;pointer-events:none;">
-    <div style="width:100%;background:#1a1a2e;border:1.5px solid rgba(0,229,255,0.15);border-radius:20px;min-height:110px;display:flex;align-items:center;justify-content:center;margin-bottom:0;position:relative;">
-      <input type="text" id="userInput" style="background:transparent!important;border:none!important;width:100%;color:#ffffff!important;font-size:2rem;font-weight:900;text-align:center;letter-spacing:12px;outline:none;font-family:Tajawal,sans-serif;padding:20px;" placeholder="_ _ _" maxlength="20" oninput="filterInput(this)" />
-    </div>
-    <button class="btn btn-confirm" onclick="checkAnswer()">ENTER</button>
-  </div>
-
-  <button class="btn btn-ghost" onclick="if(confirm('تريد إعادة اللعبة؟')) startGame()">إعادة المحاولة</button>
 </div>
+
+<div class="progress-wrap">
+  <div class="progress-top">
+    <span>PROGRESS</span>
+    <span id="progLabel">LEVEL 1</span>
+  </div>
+  <div class="progress-track">
+    <div class="progress-fill" id="progFill" style="width:3%"></div>
+  </div>
+</div>
+
+<div class="display-box" id="displayBox">
+  <svg class="countdown-svg" id="countdownSvg" viewBox="0 0 100 100" width="70" height="70">
+    <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="6"/>
+    <circle id="countdownCircle" cx="50" cy="50" r="40" fill="none" stroke="#00e5ff" stroke-width="6"
+      stroke-linecap="round" stroke-dasharray="251" stroke-dashoffset="251"
+      transform="rotate(-90 50 50)"
+      style="filter:drop-shadow(0 0 6px rgba(0,229,255,0.7));"/>
+  </svg>
+  <div class="display-sublabel" id="displaySub"></div>
+  <div class="display-text" id="displayEl">READY...</div>
+</div>
+
+<div class="input-wrap" id="inputWrap" style="opacity:0.3;pointer-events:none;">
+  <div class="input-box" id="inputBox">
+    <input type="text" class="real-input" id="userInput"
+      inputmode="numeric" enterkeyhint="done"
+      maxlength="20"
+      oninput="handleInput(this)"
+      onkeydown="if(event.key==='Enter'){event.preventDefault();}"
+      onfocus="document.getElementById('inputBox').classList.add('active')"
+      onblur="document.getElementById('inputBox').classList.remove('active')"
+    />
+    <div class="input-display hidden" id="inputDisplay"></div>
+    <div class="input-placeholder" id="inputPlaceholder">YOUR ANSWER</div>
+  </div>
+  <button class="btn-enter" id="enterBtn" onclick="checkAnswer()" dir="ltr">ENTER</button>
+</div>
+
+<button class="btn-ghost" onclick="if(confirm('Restart?')) startGame()" dir="ltr">RESTART</button>
 ```
 
   </div>
 
-  <!-- شاشة النتيجة -->
+  <!-- RESULT SCREEN -->
 
-  <div id="resultScreen" class="hidden">
-    <div class="header">
-      <div class="logo">
-        <div class="logo-icon"><svg viewBox="0 0 14 14" width="26" height="26" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="0" width="2" height="2" fill="#fff"/><rect x="5" y="2" width="4" height="2" fill="#fff"/><rect x="0" y="4" width="14" height="2" fill="#fff"/><rect x="2" y="6" width="10" height="2" fill="#fff"/><rect x="3" y="8" width="8" height="2" fill="#fff"/><rect x="2" y="10" width="2" height="2" fill="#fff"/><rect x="10" y="10" width="2" height="2" fill="#fff"/><rect x="1" y="12" width="3" height="2" fill="#fff"/><rect x="10" y="12" width="3" height="2" fill="#fff"/></svg></div>
-        <h1>تذكّر الأرقام</h1>
-      </div>
-    </div>
+  <div id="resultScreen" class="screen">
+    <div class="result-wrap">
+      <div class="result-tag" dir="ltr">SESSION OVER</div>
+      <div class="result-title" id="resultTitle">GAME OVER</div>
 
 ```
-<div class="card">
-  <div class="result-icon" id="resultEmoji">💀</div>
-  <div class="result-title" id="resultTitle">انتهت اللعبة!</div>
-  <div class="result-sub">وصلت إلى المرحلة</div>
-  <div class="result-score" id="resultScore">0</div>
-  <div class="result-best">أعلى نقطة حققتها: <span id="resultBest">0</span></div>
+  <div class="result-scores">
+    <div class="result-score-box">
+      <div class="result-score-label">REACHED</div>
+      <div class="result-score-val" id="resultScore">0</div>
+    </div>
+    <div class="result-score-box">
+      <div class="result-score-label">BEST</div>
+      <div class="result-score-val" id="resultBest">0</div>
+    </div>
+  </div>
 
-  <button class="btn btn-start" onclick="startGame()">العب مجدداً 🔄</button>
-  <button class="btn btn-ghost" onclick="showStart()" style="margin-top:10px;">الصفحة الرئيسية</button>
+  <button class="btn-play" onclick="startGame()" dir="ltr" style="margin-bottom:12px;">PLAY AGAIN</button>
+  <button class="btn-ghost" onclick="showScreen('startScreen')" dir="ltr">MAIN MENU</button>
 </div>
 ```
 
@@ -701,163 +654,183 @@ margin-bottom: 24px;
 <script>
   let seq = [], level = 1, lives = 3, best = 0, phase = 'idle';
 
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
   function startGame() {
-    seq = []; level = 1; lives = 3; phase = 'showing';
-    show('gameScreen');
-    updateStats();
+    seq = []; level = 1; lives = 3; phase = 'idle';
+    showScreen('gameScreen');
+    updateHUD();
     renderLives();
-    nextRound();
+    runCountdown(() => nextRound());
   }
 
-  function show(id) {
-    ['startScreen','gameScreen','resultScreen'].forEach(s => {
-      document.getElementById(s).classList.toggle('hidden', s !== id);
-    });
-  }
+  function runCountdown(cb) {
+    const svg = document.getElementById('countdownSvg');
+    const circle = document.getElementById('countdownCircle');
+    const el = document.getElementById('displayEl');
+    const sub = document.getElementById('displaySub');
 
-  function showStart() { show('startScreen'); }
+    svg.style.display = 'block';
+    el.textContent = '';
+    sub.textContent = '';
+
+    const circumference = 251;
+    const totalMs = 1600;
+    const start = performance.now();
+    circle.setAttribute('stroke-dashoffset', circumference);
+
+    function animate(now) {
+      const p = Math.min((now - start) / totalMs, 1);
+      circle.setAttribute('stroke-dashoffset', circumference - circumference * p);
+      if (p < 1) { requestAnimationFrame(animate); }
+      else {
+        svg.style.display = 'none';
+        cb();
+      }
+    }
+    requestAnimationFrame(animate);
+  }
 
   function nextRound() {
     phase = 'showing';
-    clearFeedback();
-    document.getElementById('userInput').value = '';
+    clearInputUI();
     lockInput(true);
     seq.push(Math.floor(Math.random() * 10));
-    updateStats();
-    setDisplay('استعد!', false);
+    updateHUD();
+    setDisplayText('WATCH CLOSELY', ''); document.getElementById('displayEl').dir='ltr';
     setTimeout(() => showSeq(0), 700);
   }
 
   function showSeq(i) {
     if (i >= seq.length) {
-      setDisplay('أدخل الأرقام', false);
+      setDisplayText('YOUR TURN', ''); document.getElementById('displayEl').dir='ltr';
       lockInput(false);
       document.getElementById('userInput').focus();
       phase = 'input';
       return;
     }
-    setDisplay(seq[i].toString(), true);
+    setDisplayNumber(seq[i].toString(), `${i + 1} OF ${seq.length}`);
     setTimeout(() => {
-      setDisplay('', false);
+      setDisplayText('', '');
       setTimeout(() => showSeq(i + 1), 180);
     }, 650);
   }
 
-  function setDisplay(text, isNum) {
+  function setDisplayNumber(num, sub) {
     const el = document.getElementById('displayEl');
-    if (isNum) {
-      el.className = 'display-num';
-      // حجم الخط يتكيف مع طول التسلسل
-      const len = seq.length;
-      if (len <= 4) el.style.fontSize = '3rem';
-      else if (len <= 7) el.style.fontSize = '2.2rem';
-      else if (len <= 10) el.style.fontSize = '1.6rem';
-      else el.style.fontSize = '1.2rem';
-    } else {
-      el.className = 'display-msg';
-      el.style.fontSize = '';
-    }
-    // لابل
-    const box = document.getElementById('displayBox');
-    let lbl = box.querySelector('.display-label');
-    if (!lbl) { lbl = document.createElement('div'); lbl.className = 'display-label'; box.insertBefore(lbl, el); }
-    lbl.textContent = isNum ? `رقم ${seq.indexOf(parseInt(text)) + 1} من ${seq.length}` : '';
+    const subEl = document.getElementById('displaySub');
+    el.className = 'display-number';
+    el.textContent = num;
+    subEl.textContent = sub;
+  }
+
+  function setDisplayText(text, sub) {
+    const el = document.getElementById('displayEl');
+    const subEl = document.getElementById('displaySub');
+    el.className = 'display-text';
     el.textContent = text;
+    subEl.textContent = sub;
   }
 
-  function filterInput(inp) {
+  function handleInput(inp) {
     inp.value = inp.value.replace(/[^0-9]/g, '');
-    if (inp.value.length > seq.length) {
-      inp.value = inp.value.slice(0, seq.length);
-    }
-  }
+    if (inp.value.length > seq.length) inp.value = inp.value.slice(0, seq.length);
 
-  function flashDisplay(type) {
-    const wrapper = document.querySelector('#inputGroup > div');
-    if (type === 'correct') {
-      wrapper.style.background = 'rgba(0,255,120,0.25)';
-      wrapper.style.borderColor = 'rgba(0,255,120,0.7)';
-      wrapper.style.boxShadow = '0 0 20px rgba(0,255,120,0.3)';
+    const disp = document.getElementById('inputDisplay');
+    const ph = document.getElementById('inputPlaceholder');
+    if (inp.value.length > 0) {
+      disp.textContent = inp.value;
+      disp.classList.remove('hidden');
+      ph.classList.add('hidden');
     } else {
-      wrapper.style.background = 'rgba(255,60,60,0.25)';
-      wrapper.style.borderColor = 'rgba(255,60,60,0.7)';
-      wrapper.style.boxShadow = '0 0 20px rgba(255,60,60,0.3)';
+      disp.classList.add('hidden');
+      ph.classList.remove('hidden');
     }
-    setTimeout(() => {
-      wrapper.style.background = '#1a1a2e';
-      wrapper.style.borderColor = 'rgba(0,229,255,0.15)';
-      wrapper.style.boxShadow = 'none';
-    }, 700);
   }
 
   function checkAnswer() {
     if (phase !== 'input') return;
     const val = document.getElementById('userInput').value.trim();
     const correct = seq.join('');
+    if (!val) return;
+
     if (val === correct) {
-      flashDisplay('correct');
+      flashBox('correct');
+      setDisplayText('NICE!', '');
       level++;
       if (level - 1 > best) best = level - 1;
       lockInput(true);
-      setTimeout(() => nextRound(), 900);
+      setTimeout(() => runCountdown(() => nextRound()), 900);
     } else {
       lives--;
       renderLives();
-      flashDisplay('wrong');
+      flashBox('wrong');
+      setDisplayText('WRONG', '');
       if (lives <= 0) {
         if (level - 1 > best) best = level - 1;
-        setTimeout(() => showResult(), 800);
+        setTimeout(() => showResult(), 1000);
       } else {
-        const triesText = lives === 1 ? 'محاولة واحدة' : lives === 2 ? 'محاولتان' : `${lives} محاولات`;
-        setDisplay(`تبقى لك ${triesText}`, false);
         setTimeout(() => {
-          setDisplay('أدخل الأرقام', false);
-        }, 1000);
-        document.getElementById('userInput').value = '';
-        document.getElementById('userInput').focus();
+          setDisplayText('YOUR TURN', ''); document.getElementById('displayEl').dir='ltr';
+          clearInputUI();
+          document.getElementById('userInput').value = '';
+          document.getElementById('userInput').focus();
+        }, 900);
       }
     }
   }
 
-  function showResult() {
-    show('resultScreen');
-    const reached = level - 1;
-    document.getElementById('resultScore').textContent = reached;
-    document.getElementById('resultBest').textContent = best;
-    const emoji = document.getElementById('resultEmoji');
-    const title = document.getElementById('resultTitle');
-    if (reached >= 12) { emoji.textContent = '🏆'; title.textContent = 'أسطورة الذاكرة!'; }
-    else if (reached >= 8) { emoji.textContent = '🌟'; title.textContent = 'أداء رائع جداً!'; }
-    else if (reached >= 5) { emoji.textContent = '😎'; title.textContent = 'مش بطال!'; }
-    else { emoji.textContent = '😅'; title.textContent = 'حاول مرة ثانية!'; }
+  function flashBox(type) {
+    const box = document.getElementById('inputBox');
+    box.classList.add(type === 'correct' ? 'flash-correct' : 'flash-wrong');
+    if (type === 'wrong') {
+      document.getElementById('displayBox').classList.add('flash-wrong');
+    }
+    setTimeout(() => {
+      box.classList.remove('flash-correct', 'flash-wrong');
+      document.getElementById('displayBox').classList.remove('flash-wrong');
+    }, 600);
   }
 
-  function updateStats() {
-    document.getElementById('statLevel').textContent = level;
-    document.getElementById('statLen').textContent = seq.length || 1;
-    document.getElementById('statBest').textContent = best;
-    document.getElementById('progText').textContent = `المرحلة ${level}`;
+  function clearInputUI() {
+    const disp = document.getElementById('inputDisplay');
+    const ph = document.getElementById('inputPlaceholder');
+    disp.classList.add('hidden');
+    ph.classList.remove('hidden');
+    document.getElementById('userInput').value = '';
+  }
+
+  function lockInput(lock) {
+    const wrap = document.getElementById('inputWrap');
+    wrap.style.opacity = lock ? '0.25' : '1';
+    wrap.style.pointerEvents = lock ? 'none' : 'all';
+  }
+
+  function updateHUD() {
+    document.getElementById('hudLevel').textContent = level;
+    document.getElementById('hudBest').textContent = best;
+    document.getElementById('progLabel').textContent = `LEVEL ${level}`;
     document.getElementById('progFill').style.width = Math.min((level / 20) * 100, 100) + '%';
   }
 
   function renderLives() {
-    document.querySelectorAll('.heart').forEach((h, i) => h.classList.toggle('lost', i >= lives));
+    const segs = document.querySelectorAll('.life-seg');
+    segs.forEach((s, i) => s.classList.toggle('lost', i >= lives));
   }
 
-  function lockInput(lock) {
-    const g = document.getElementById('inputGroup');
-    g.style.opacity = lock ? '0.3' : '1';
-    g.style.pointerEvents = lock ? 'none' : 'all';
-  }
-
-  function showFeedback(msg, type) {
-    const el = document.getElementById('feedbackEl');
-    el.textContent = msg;
-    el.className = `feedback ${type} show`;
-  }
-
-  function clearFeedback() {
-    document.getElementById('feedbackEl').className = 'feedback';
+  function showResult() {
+    showScreen('resultScreen');
+    const reached = level - 1;
+    document.getElementById('resultScore').textContent = reached;
+    document.getElementById('resultBest').textContent = best;
+    const title = document.getElementById('resultTitle');
+    if (reached >= 12) title.textContent = 'LEGENDARY';
+    else if (reached >= 8) title.textContent = 'IMPRESSIVE';
+    else if (reached >= 5) title.textContent = 'NOT BAD';
+    else title.textContent = 'GAME OVER';
   }
 
   document.addEventListener('keydown', e => {
