@@ -210,23 +210,25 @@ color: #00e5ff;
 /* حياة */
 .lives-wrap {
 display: flex;
-gap: 6px;
+gap: 10px;
 align-items: center;
 }
 
-.life-seg {
-width: 28px;
-height: 6px;
-border-radius: 3px;
-background: linear-gradient(90deg, #00e5ff, #7c3aed);
-box-shadow: 0 0 8px rgba(0,229,255,0.5);
-transition: all 0.3s;
+.life-heart {
+width: 26px;
+height: 24px;
+transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
 }
 
-.life-seg.lost {
-background: rgba(255,255,255,0.08);
-box-shadow: none;
+.life-heart svg { width: 100%; height: 100%; }
+
+.life-heart.lost {
+transform: scale(0.8);
+opacity: 0.2;
 }
+
+.life-heart.lost .hfill { fill: #333; }
+.life-heart.lost .hshine { fill: #222; }
 
 /* مربع العرض */
 .display-box {
@@ -297,9 +299,9 @@ to { transform: scale(1); opacity: 1; }
 }
 
 .display-text { direction: ltr; unicode-bidi: embed;
-font-size: 0.95rem;
-color: rgba(255,255,255,0.35);
-letter-spacing: 2px;
+font-size: 0.8rem;
+color: rgba(255,255,255,0.3);
+letter-spacing: 4px;
 text-transform: uppercase;
 }
 
@@ -568,9 +570,9 @@ display: none;
   <div>
     <div style="font-size:0.6rem;color:rgba(255,255,255,0.25);letter-spacing:2px;text-align:center;margin-bottom:6px;">LIVES</div>
     <div class="lives-wrap" id="livesEl">
-      <div class="life-seg"></div>
-      <div class="life-seg"></div>
-      <div class="life-seg"></div>
+      <div class="life-heart"><svg viewBox="0 0 16 14" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg"><rect class="hfill" x="1" y="0" width="3" height="1" fill="#ff2244"/><rect class="hfill" x="6" y="0" width="3" height="1" fill="#ff2244"/><rect class="hfill" x="0" y="1" width="5" height="1" fill="#ff2244"/><rect class="hshine" x="1" y="1" width="2" height="1" fill="#ff6680"/><rect class="hfill" x="6" y="1" width="3" height="1" fill="#ff2244"/><rect class="hfill" x="0" y="2" width="9" height="1" fill="#ff2244"/><rect class="hfill" x="0" y="3" width="9" height="1" fill="#ff2244"/><rect class="hfill" x="1" y="4" width="7" height="1" fill="#ff2244"/><rect class="hfill" x="2" y="5" width="5" height="1" fill="#ff2244"/><rect class="hfill" x="3" y="6" width="3" height="1" fill="#ff2244"/><rect class="hfill" x="4" y="7" width="1" height="1" fill="#ff2244"/></svg></div>
+      <div class="life-heart"><svg viewBox="0 0 16 14" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg"><rect class="hfill" x="1" y="0" width="3" height="1" fill="#ff2244"/><rect class="hfill" x="6" y="0" width="3" height="1" fill="#ff2244"/><rect class="hfill" x="0" y="1" width="5" height="1" fill="#ff2244"/><rect class="hshine" x="1" y="1" width="2" height="1" fill="#ff6680"/><rect class="hfill" x="6" y="1" width="3" height="1" fill="#ff2244"/><rect class="hfill" x="0" y="2" width="9" height="1" fill="#ff2244"/><rect class="hfill" x="0" y="3" width="9" height="1" fill="#ff2244"/><rect class="hfill" x="1" y="4" width="7" height="1" fill="#ff2244"/><rect class="hfill" x="2" y="5" width="5" height="1" fill="#ff2244"/><rect class="hfill" x="3" y="6" width="3" height="1" fill="#ff2244"/><rect class="hfill" x="4" y="7" width="1" height="1" fill="#ff2244"/></svg></div>
+      <div class="life-heart"><svg viewBox="0 0 16 14" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg"><rect class="hfill" x="1" y="0" width="3" height="1" fill="#ff2244"/><rect class="hfill" x="6" y="0" width="3" height="1" fill="#ff2244"/><rect class="hfill" x="0" y="1" width="5" height="1" fill="#ff2244"/><rect class="hshine" x="1" y="1" width="2" height="1" fill="#ff6680"/><rect class="hfill" x="6" y="1" width="3" height="1" fill="#ff2244"/><rect class="hfill" x="0" y="2" width="9" height="1" fill="#ff2244"/><rect class="hfill" x="0" y="3" width="9" height="1" fill="#ff2244"/><rect class="hfill" x="1" y="4" width="7" height="1" fill="#ff2244"/><rect class="hfill" x="2" y="5" width="5" height="1" fill="#ff2244"/><rect class="hfill" x="3" y="6" width="3" height="1" fill="#ff2244"/><rect class="hfill" x="4" y="7" width="1" height="1" fill="#ff2244"/></svg></div>
     </div>
   </div>
 
@@ -712,19 +714,22 @@ display: none;
       phase = 'input';
       return;
     }
-    setDisplayNumber(seq[i].toString(), `${i + 1} OF ${seq.length}`);
+    const fontSize = seq.length <= 4 ? '3.5rem' : seq.length <= 7 ? '2.8rem' : seq.length <= 10 ? '2.2rem' : '1.6rem';
+    setDisplayNumber(seq[i].toString(), `${i + 1} OF ${seq.length}`, fontSize);
     setTimeout(() => {
       setDisplayText('', '');
       setTimeout(() => showSeq(i + 1), 180);
     }, 650);
   }
 
-  function setDisplayNumber(num, sub) {
+  function setDisplayNumber(num, sub, fontSize) {
     const el = document.getElementById('displayEl');
     const subEl = document.getElementById('displaySub');
     el.className = 'display-number';
+    el.style.fontSize = fontSize || '3.5rem';
     el.textContent = num;
     subEl.textContent = sub;
+    subEl.dir = 'ltr';
   }
 
   function setDisplayText(text, sub) {
@@ -817,8 +822,8 @@ display: none;
   }
 
   function renderLives() {
-    const segs = document.querySelectorAll('.life-seg');
-    segs.forEach((s, i) => s.classList.toggle('lost', i >= lives));
+    const hearts = document.querySelectorAll('.life-heart');
+    hearts.forEach((h, i) => h.classList.toggle('lost', i >= lives));
   }
 
   function showResult() {
