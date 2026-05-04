@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
 <title>MEMORY MODE</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -24,10 +24,12 @@ font-family: ‘Space Grotesk’, ‘Tajawal’, sans-serif;
 background: #07070f;
 color: #fff;
 min-height: 100vh;
+min-height: 100dvh;
 display: flex;
-align-items: center;
+align-items: flex-start;
 justify-content: center;
-overflow: hidden;
+overflow-y: auto;
+overflow-x: hidden;
 }
 
 /* خلفية */
@@ -710,7 +712,7 @@ display: none;
     if (i >= seq.length) {
       setDisplayText('YOUR TURN', ''); document.getElementById('displayEl').dir='ltr';
       lockInput(false);
-      document.getElementById('userInput').focus();
+      document.getElementById('userInput').focus(); window.scrollTo(0,0);
       phase = 'input';
       return;
     }
@@ -736,6 +738,7 @@ display: none;
     const el = document.getElementById('displayEl');
     const subEl = document.getElementById('displaySub');
     el.className = 'display-text';
+    el.style.fontSize = '';
     el.textContent = text;
     subEl.textContent = sub;
   }
@@ -782,7 +785,7 @@ display: none;
           setDisplayText('YOUR TURN', ''); document.getElementById('displayEl').dir='ltr';
           clearInputUI();
           document.getElementById('userInput').value = '';
-          document.getElementById('userInput').focus();
+          document.getElementById('userInput').focus(); window.scrollTo(0,0);
         }, 900);
       }
     }
