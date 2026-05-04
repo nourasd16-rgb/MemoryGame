@@ -511,6 +511,55 @@ text-shadow: 0 0 20px rgba(0,229,255,0.4);
 display: none;
 }
 
+/* كيبورد داخلي */
+.numpad {
+margin-top: 10px;
+display: flex;
+flex-direction: column;
+gap: 8px;
+}
+
+.numpad-row {
+display: grid;
+grid-template-columns: 1fr 1fr 1fr;
+gap: 8px;
+}
+
+.numpad-key {
+background: rgba(255,255,255,0.06);
+border: 1px solid rgba(255,255,255,0.08);
+border-radius: 12px;
+padding: 16px;
+font-family: ‘Space Grotesk’, sans-serif;
+font-size: 1.2rem;
+font-weight: 700;
+color: #fff;
+cursor: pointer;
+transition: all 0.1s;
+-webkit-tap-highlight-color: transparent;
+}
+
+.numpad-key:active {
+background: rgba(0,229,255,0.15);
+border-color: rgba(0,229,255,0.4);
+transform: scale(0.94);
+}
+
+.numpad-del {
+background: rgba(255,60,60,0.08);
+border-color: rgba(255,60,60,0.15);
+color: rgba(255,100,100,0.8);
+}
+
+.numpad-ok {
+background: linear-gradient(135deg, #00e5ff, #0099cc);
+border-color: transparent;
+color: #000;
+font-weight: 900;
+letter-spacing: 2px;
+box-shadow: 0 0 16px rgba(0,229,255,0.3);
+}
+
 /* إخفاء */
 .hidden { display: none !important; }
 </style>
@@ -608,18 +657,33 @@ display: none;
 
 <div class="input-wrap" id="inputWrap" style="opacity:0.3;pointer-events:none;">
   <div class="input-box" id="inputBox">
-    <input type="text" class="real-input" id="userInput"
-      inputmode="numeric" enterkeyhint="done"
-      maxlength="20"
-      oninput="handleInput(this)"
-      onkeydown="if(event.key==='Enter'){event.preventDefault();}"
-      onfocus="document.getElementById('inputBox').classList.add('active')"
-      onblur="document.getElementById('inputBox').classList.remove('active')"
-    />
-    <div class="input-display hidden" id="inputDisplay"></div>
+    <div class="input-display" id="inputDisplay" style="min-height:28px;"></div>
     <div class="input-placeholder" id="inputPlaceholder">YOUR ANSWER</div>
   </div>
-  <button class="btn-enter" id="enterBtn" onclick="checkAnswer()" dir="ltr">ENTER</button>
+
+  <!-- كيبورد داخل اللعبة -->
+  <div class="numpad" id="numpad">
+    <div class="numpad-row">
+      <button class="numpad-key" onclick="numpadPress('1')">1</button>
+      <button class="numpad-key" onclick="numpadPress('2')">2</button>
+      <button class="numpad-key" onclick="numpadPress('3')">3</button>
+    </div>
+    <div class="numpad-row">
+      <button class="numpad-key" onclick="numpadPress('4')">4</button>
+      <button class="numpad-key" onclick="numpadPress('5')">5</button>
+      <button class="numpad-key" onclick="numpadPress('6')">6</button>
+    </div>
+    <div class="numpad-row">
+      <button class="numpad-key" onclick="numpadPress('7')">7</button>
+      <button class="numpad-key" onclick="numpadPress('8')">8</button>
+      <button class="numpad-key" onclick="numpadPress('9')">9</button>
+    </div>
+    <div class="numpad-row">
+      <button class="numpad-key numpad-ok" onclick="checkAnswer()" dir="ltr">OK</button>
+      <button class="numpad-key" onclick="numpadPress('0')">0</button>
+      <button class="numpad-key numpad-del" onclick="numpadDelete()">⌫</button>
+    </div>
+  </div>
 </div>
 
 <button class="btn-ghost" onclick="if(confirm('Restart?')) startGame()" dir="ltr">RESTART</button>
@@ -712,7 +776,7 @@ display: none;
     if (i >= seq.length) {
       setDisplayText('YOUR TURN', ''); document.getElementById('displayEl').dir='ltr';
       lockInput(false);
-      document.getElementById('userInput').focus(); window.scrollTo(0,0);
+      
       phase = 'input';
       return;
     }
@@ -738,34 +802,45 @@ display: none;
     const el = document.getElementById('displayEl');
     const subEl = document.getElementById('displaySub');
     el.className = 'display-text';
-    el.style.fontSize = '';
+    el.style.fontSize = '0.8rem';
     el.textContent = text;
     subEl.textContent = sub;
   }
 
-  function handleInput(inp) {
-    inp.value = inp.value.replace(/[^0-9]/g, '');
-    if (inp.value.length > seq.length) inp.value = inp.value.slice(0, seq.length);
+  let currentInput = '';
 
+  function numpadPress(num) {
+    if (phase !== 'input') return;
+    if (currentInput.length >= seq.length) return;
+    currentInput += num;
+    updateInputDisplay();
+  }
+
+  function numpadDelete() {
+    if (currentInput.length === 0) return;
+    currentInput = currentInput.slice(0, -1);
+    updateInputDisplay();
+  }
+
+  function updateInputDisplay() {
     const disp = document.getElementById('inputDisplay');
     const ph = document.getElementById('inputPlaceholder');
-    if (inp.value.length > 0) {
-      disp.textContent = inp.value;
-      disp.classList.remove('hidden');
-      ph.classList.add('hidden');
+    if (currentInput.length > 0) {
+      disp.textContent = currentInput.split('').join(' ');
+      disp.style.display = 'block';
+      ph.style.display = 'none';
     } else {
-      disp.classList.add('hidden');
-      ph.classList.remove('hidden');
+      disp.style.display = 'none';
+      ph.style.display = 'block';
     }
   }
 
   function checkAnswer() {
     if (phase !== 'input') return;
-    const val = document.getElementById('userInput').value.trim();
+    if (!currentInput) return;
     const correct = seq.join('');
-    if (!val) return;
 
-    if (val === correct) {
+    if (currentInput === correct) {
       flashBox('correct');
       setDisplayText('NICE!', '');
       level++;
@@ -782,10 +857,9 @@ display: none;
         setTimeout(() => showResult(), 1000);
       } else {
         setTimeout(() => {
-          setDisplayText('YOUR TURN', ''); document.getElementById('displayEl').dir='ltr';
+          setDisplayText('YOUR TURN', '');
+          document.getElementById('displayEl').dir = 'ltr';
           clearInputUI();
-          document.getElementById('userInput').value = '';
-          document.getElementById('userInput').focus(); window.scrollTo(0,0);
         }, 900);
       }
     }
@@ -804,11 +878,11 @@ display: none;
   }
 
   function clearInputUI() {
+    currentInput = '';
     const disp = document.getElementById('inputDisplay');
     const ph = document.getElementById('inputPlaceholder');
-    disp.classList.add('hidden');
-    ph.classList.remove('hidden');
-    document.getElementById('userInput').value = '';
+    disp.style.display = 'none';
+    ph.style.display = 'block';
   }
 
   function lockInput(lock) {
