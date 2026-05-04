@@ -662,7 +662,7 @@ box-shadow: 0 0 16px rgba(0,229,255,0.3);
   </div>
 
   <!-- كيبورد داخل اللعبة -->
-  <div class="numpad" id="numpad">
+  <div class="numpad" id="numpad" dir="ltr">
     <div class="numpad-row">
       <button class="numpad-key" onclick="numpadPress('1')">1</button>
       <button class="numpad-key" onclick="numpadPress('2')">2</button>
@@ -679,9 +679,9 @@ box-shadow: 0 0 16px rgba(0,229,255,0.3);
       <button class="numpad-key" onclick="numpadPress('9')">9</button>
     </div>
     <div class="numpad-row">
-      <button class="numpad-key numpad-ok" onclick="checkAnswer()" dir="ltr">OK</button>
-      <button class="numpad-key" onclick="numpadPress('0')">0</button>
       <button class="numpad-key numpad-del" onclick="numpadDelete()">⌫</button>
+      <button class="numpad-key" onclick="numpadPress('0')">0</button>
+      <button class="numpad-key numpad-ok" onclick="checkAnswer()" dir="ltr">OK</button>
     </div>
   </div>
 </div>
